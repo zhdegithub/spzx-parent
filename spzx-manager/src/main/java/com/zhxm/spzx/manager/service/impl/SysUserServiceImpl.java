@@ -3,7 +3,9 @@ package com.zhxm.spzx.manager.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.atguigu.spzx.model.dto.system.LoginDto;
 import com.atguigu.spzx.model.entity.system.SysUser;
+import com.atguigu.spzx.model.vo.common.ResultCodeEnum;
 import com.atguigu.spzx.model.vo.system.LoginVo;
+import com.zhxm.spzx.common.exception.ZhException;
 import com.zhxm.spzx.manager.mapper.SysUserMapper;
 import com.zhxm.spzx.manager.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,8 @@ public class SysUserServiceImpl implements SysUserService {
 
         //3 根据用户名查不到对于信息，用户不存在，返回错误信息
         if(sysUser == null){
-            throw new RuntimeException("用户名不存在");
+//            throw new RuntimeException("用户名不存在");
+            throw new ZhException(ResultCodeEnum.LOGIN_ERROR);
         }
         //4 如果根据用户名查询到用户信息，用户存在
         //5 获取输入的密码，比较输入的密码和数据库密码是否一致
@@ -39,7 +42,8 @@ public class SysUserServiceImpl implements SysUserService {
         String database_password = sysUser.getPassword();
         String input_password = DigestUtils.md5DigestAsHex(loginDto.getPassword().getBytes());
         if (!input_password.equals(database_password)){
-            throw new RuntimeException("密码不正确");
+//            throw new RuntimeException("密码不正确");
+            throw new ZhException(ResultCodeEnum.LOGIN_ERROR);
         }
 
         //6 如果密码一致，登录成功，如果密码不一致登录失败
