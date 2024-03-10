@@ -172,5 +172,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:6.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:6.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:6.0.7" level="project" />
+    <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.8.9" level="project" />
   </component>
 </module>
