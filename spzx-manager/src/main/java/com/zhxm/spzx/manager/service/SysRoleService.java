@@ -9,6 +9,9 @@ public interface SysRoleService {
     // 角色列表的方法
     PageInfo<SysRole> findByPage(SysRoleDto sysRoleDto, Integer current, Integer limit);
 
-    //角色添加的方法
+    // 角色添加的方法
     void savaSysRole(SysRole sysRole);
+
+    // 角色修改的方法
+    void updateSysRole(SysRole sysRole);
 }
