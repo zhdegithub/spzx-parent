@@ -8,6 +8,7 @@ import com.atguigu.spzx.model.vo.system.LoginVo;
 import com.atguigu.spzx.model.vo.system.ValidateCodeVo;
 import com.zhxm.spzx.manager.service.SysUserService;
 import com.zhxm.spzx.manager.service.ValidateCodeService;
+import com.zhxm.spzx.utils.AuthContextUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,26 +24,41 @@ public class IndexController {
     @Autowired
     private ValidateCodeService validateCodeService;
 
-    //获取当前登录用户信息
+    /**
+     * 获取当前登录用户信息
+     */
+//    @GetMapping(value = "/getUserInfo")
+//    public Result getUserInfo(@RequestHeader(name = "token") String token){
+//        //1 从请求头获取token
+////        String token = request.getHeader("token");
+//        //2 根据token查询redis获取用户信息
+//        SysUser sysUser = sysUserService.getUserInfo(token);
+//
+//        //3 用户信息返回
+//        return Result.build(sysUser,ResultCodeEnum.SUCCESS);
+//    }
     @GetMapping(value = "/getUserInfo")
-    public Result getUserInfo(@RequestHeader(name = "token") String token){
-        //1 从请求头获取token
-//        String token = request.getHeader("token");
-        //2 根据token查询redis获取用户信息
-        SysUser sysUser = sysUserService.getUserInfo(token);
-
-        //3 用户信息返回
-        return Result.build(sysUser,ResultCodeEnum.SUCCESS);
+    public Result getUserInfo(){
+        return Result.build(AuthContextUtil.get(),ResultCodeEnum.SUCCESS);
     }
 
-    //生成图片验证码
+
+
+    /**
+     * 生成图片验证码
+     * @return
+     */
     @GetMapping(value = "/generateValidateCode")
     public Result<ValidateCodeVo> generateValidateCode() {
         ValidateCodeVo validateCodeVo = validateCodeService.generateValidateCode();
         return Result.build(validateCodeVo,ResultCodeEnum.SUCCESS);
     }
 
-    //用户登录
+    /**
+     * 用户登录
+     * @param loginDto
+     * @return
+     */
     @Operation(summary = "登录的方法")
     @PostMapping("login")
     public Result login(@RequestBody LoginDto loginDto){
@@ -50,7 +66,11 @@ public class IndexController {
         return Result.build(loginVo, ResultCodeEnum.SUCCESS);
     }
 
-    //用户退出
+    /**
+     * 用户退出
+     * @param token
+     * @return
+     */
     @GetMapping(value = "/logout")
     public Result logout(@RequestHeader(name = "token") String token){
         sysUserService.logout(token);
