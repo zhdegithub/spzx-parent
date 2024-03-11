@@ -1,5 +1,6 @@
 package com.zhxm.spzx.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.atguigu.spzx.model.dto.system.LoginDto;
 import com.atguigu.spzx.model.entity.system.SysUser;
@@ -25,6 +26,24 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public LoginVo login(LoginDto loginDto) {
+
+        //1 获取输入验证码和存储到redis的key名称   LoginDto获取到
+        String captcha = loginDto.getCaptcha();
+        String key = loginDto.getCodeKey();
+
+        //2 根据获取的redis里面key ，查询redis里面存储验证码
+        String redisCode = redisTemplate.opsForValue().get("user:validate" + key);
+
+        //3 比较输入的验证码和redis存储验证码是否一致
+        //4 如果不一致，提示用户，校验失败
+        if (StrUtil.isEmpty(redisCode) || StrUtil.equalsIgnoreCase(redisCode,captcha)){
+            throw new ZhException(ResultCodeEnum.VALIDATECODE_ERROR);
+        }
+
+        //5 如果一致，删除redis里面验证码
+        redisTemplate.delete("user:validate" + key);
+
+
         //1 获取提交用户名，LoginDto获取到
         String username = loginDto.getUserName();
 
