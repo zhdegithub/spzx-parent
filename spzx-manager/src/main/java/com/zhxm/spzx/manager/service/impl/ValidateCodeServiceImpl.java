@@ -27,12 +27,12 @@ public class ValidateCodeServiceImpl implements ValidateCodeService {
         String imageBase64 = circleCaptcha.getImageBase64();  //返回图片验证码，base64编码
 
         //2 把验证码存储的redis里面，设置redis的key：uuid  redis的value：验证码值 设置过期时间
-        String key = UUID.randomUUID().toString().replaceAll("-","");
-        redisTemplate.opsForValue().set("user:validate"+key,codeValue,5, TimeUnit.MINUTES);
+        String codeKey = UUID.randomUUID().toString().replaceAll("-","");
+        redisTemplate.opsForValue().set("user:login:validatecode:"+codeKey,codeValue,5, TimeUnit.MINUTES);
 
         //3 返回ValidateCodeVo对象
         ValidateCodeVo validateCodeVo = new ValidateCodeVo();
-        validateCodeVo.setCodeKey(key);
+        validateCodeVo.setCodeKey(codeKey);
         validateCodeVo.setCodeValue("data:image/png;base64," + imageBase64);
 
         return validateCodeVo;

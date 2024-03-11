@@ -27,23 +27,6 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public LoginVo login(LoginDto loginDto) {
 
-        //1 获取输入验证码和存储到redis的key名称   LoginDto获取到
-        String captcha = loginDto.getCaptcha();
-        String key = loginDto.getCodeKey();
-
-        //2 根据获取的redis里面key ，查询redis里面存储验证码
-        String redisCode = redisTemplate.opsForValue().get("user:validate" + key);
-
-        //3 比较输入的验证码和redis存储验证码是否一致
-        //4 如果不一致，提示用户，校验失败
-        if (StrUtil.isEmpty(redisCode) || StrUtil.equalsIgnoreCase(redisCode,captcha)){
-            throw new ZhException(ResultCodeEnum.VALIDATECODE_ERROR);
-        }
-
-        //5 如果一致，删除redis里面验证码
-        redisTemplate.delete("user:validate" + key);
-
-
         //1 获取提交用户名，LoginDto获取到
         String username = loginDto.getUserName();
 
@@ -72,12 +55,41 @@ public class SysUserServiceImpl implements SysUserService {
         //8 把登录成功用户信息放到redis里面
         //key : token    value: 用户信息
         redisTemplate.opsForValue()
-                .set("user:login"+token,JSON.toJSONString(sysUser),7, TimeUnit.DAYS);
+                .set("user:login"+token,JSON.toJSONString(sysUser),7, TimeUnit.DAYS); //把对象转化成json格式
 
         //9 返回Loginvo对象
         LoginVo loginVo = new LoginVo();
         loginVo.setToken(token);
 
+        //1 获取输入验证码和存储到redis的key名称   LoginDto获取到
+        String captcha = loginDto.getCaptcha();
+        String codeKey = loginDto.getCodeKey();
+
+        //2 根据获取的redis里面key ，查询redis里面存储验证码
+        String redisCode = redisTemplate.opsForValue().get("user:login:validatecode:" + codeKey);
+
+        //3 比较输入的验证码和redis存储验证码是否一致
+        //4 如果不一致，提示用户，校验失败
+        if (StrUtil.isEmpty(redisCode) || !StrUtil.equalsIgnoreCase(redisCode,captcha)){
+            throw new ZhException(ResultCodeEnum.VALIDATECODE_ERROR);
+        }
+
+        //5 如果一致，删除redis里面验证码
+        redisTemplate.delete("user:login:validatecode:" + codeKey);
+
         return loginVo;
+    }
+
+    //获取当前登录用户信息
+    @Override
+    public SysUser getUserInfo(String token) {
+        String userJson = redisTemplate.opsForValue().get("user:login" + token);
+        SysUser sysUser = JSON.parseObject(userJson, SysUser.class);  //把json格式转化成对象
+        return sysUser;
+    }
+
+    @Override
+    public void logout(String token) {
+        redisTemplate.delete("user:login" + token);
     }
 }
