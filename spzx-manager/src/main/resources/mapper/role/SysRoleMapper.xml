@@ -9,7 +9,7 @@
         id,role_name,role_code,description,create_time,update_time,is_deleted
     </sql>
 
-    <!--  角色列表的方法  -->
+    <!--  1.角色列表的方法  -->
     <sql id="findPageWhere">
         <where>
             <if test="roleName != null and roleName != ''">
@@ -25,4 +25,21 @@
         <include refid="findPageWhere"/>
         order by id desc
     </select>
+
+    <!--  2.角色添加的方法  -->
+    <insert id="save">
+        insert into sys_role (
+            id,
+            role_name,
+            role_code,
+            description
+        ) values (
+                     #{id},
+                     #{roleName},
+                     #{roleCode},
+                     #{description}
+                 )
+    </insert>
+
+
 </mapper>
